@@ -1,18 +1,11 @@
-%html{
-	height:90%;
-}
-
-%body{
+html, body, .container, #viewPoint{
 	height:100%;
-	margin:0px;
-	padding:0px;
 }
-
-%#map-canvas{
-	height:100%;
-	width:100%;
+	
+#mapRow{
+	height: 90%;
 }
 
 #map-canvas{
-	height:500px;
+	height:100%;
 }

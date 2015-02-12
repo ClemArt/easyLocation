@@ -1,24 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="geoApp">
 <head>
 	<title>Locate your relatives !</title>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular.min.js"></script>
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular-route.js"></script>
-	<link rel="stylesheet" href="stylesheets/style.css" type="text/css" />
+	<script type="text/javascript" src="https:////ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular-cookies.js"></script>
+	<script type="text/javascript" src="javascripts/angular-ui-router.min.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" type="text/css" />
 	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8AjcbaecqJq9hUNRNMCEP5kpFNQfSBaA"></script>
-	<script type="text/javascript" src="javascripts/appGeolocation.js"></script>
+	<script type="text/javascript" src="socket.io/socket.io.js"></script>
+	
+	<link rel="stylesheet" href="stylesheets/style.css" type="text/css" />
+	<script type="text/javascript" src="javascripts/main.js"></script>
+	<script type="text/javascript" src="javascripts/controllers.js"></script>
 </head>
 
-<body onload="initializeMap()">
+<body>
 <div class="container">
 
-<div class="row">
-	<div id="map-canvas" class="col-md-12">
-	</div>
+<div ui-view id="viewPoint">
 </div>
+
+<!-- Login template -->
+<script type="text/ng-template" id="/login.html">
+<div class="row">
+	<h1 class="text-center">
+		Welcome {{you.name}}
+	</h1>
+	<p class="text-center">
+		Please log in by tipping your name (or whatever you want the others to call you).<br>
+		Your data will be deleted after you disconnect from the service.
+	</p>
+	<form ng-submit="submitLogin()" class="text-center">
+		<input type="text" ng-model="you.name" required /><br>
+		<button type="submit">Login</button>
+	</form>
+</div>
+</script>
 
 </div>
 </body>
