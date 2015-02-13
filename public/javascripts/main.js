@@ -31,3 +31,19 @@ function($stateProvider, $urlRouterProvider){
 	
 	$urlRouterProvider.otherwise('/login');
 }]);
+
+geoApp.run([
+'$rootScope',
+'$state',
+function($rootScope, $state){
+	/**
+	Error management when bad resolution of map state promises (id of user in cookie, or just find the user)
+	Need to improve this with further error management
+	*/
+	$rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error){
+		event.preventDefault();
+		if(error.status == 500){
+			return $state.go('login');
+		}
+	});
+}]);

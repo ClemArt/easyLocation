@@ -101,23 +101,17 @@ function($http, $state, $rootScope, $cookieStore){
 	o.login = function(){
 		return $http.post('/users', o.data).success(function(data){
 			o.data = data;
-			$cookieStore.put('user', o.data._id);
+			$cookieStore.put('user_id', o.data._id);
 			$state.go('map');
 		});
 	};
 	
+	//Try to get the user data with ID, and store it. If not, server throws a 500 internal server error (id not found) and app returns to login state
 	o.loginCheck = function(){
-		console.log('bite   ' + $cookieStore.get('user'));
-		if($cookieStore.get('user')){
-			return $http.get('/users/' + $cookieStore.get('user')).success(function(data){
-				o.data = data;
-				$cookieStore.put('user', o.data._id);
-			})
-			.error(function(){
-				$state.go('login');
-			});
-		}
-		$state.go('login');
+		return $http.get('/users/' + $cookieStore.get('user_id')).success(function(data, status){
+			o.data = data;
+			$cookieStore.put('user_id', o.data._id);
+		});
 	};
 	
 	o.updatePosition = function(lat, lng, callback){
