@@ -23,7 +23,8 @@ router.param('user', function(req, res, next, id){
 });
 
 router.get('/users', function(req, res, next){
-	User.find(function(err, data){
+	//Returns only users with valid ttl, to prevent unwanted informations to spread
+	User.find({ttl: {$gte: Date.now()}}, function(err, data){
 		if(err) return next(err);
 		res.json(data);
 	});
@@ -34,6 +35,8 @@ router.get('/users/:user', function(req, res, next){
 });
 
 router.post('/users', function(req, res, next){
+	// add a ttl of 3600 s to user in req.body
+	req.body.ttl = Date.now() + 3600000;
 	var user = new User(req.body);
 	//Save user to the database
 	user.save(function(err, data){

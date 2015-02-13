@@ -4,65 +4,75 @@ appCtrl.controller('mapCtrl',[
 '$scope',
 '$state',
 'you',
-function($scope, $state, you){
+'users',
+'$interval',
+function($scope, $state, you, users, $interval){
 	//Initialization of the map (for template load)
-	function initialiseMap(){
-		if(navigator.geolocation){ //Test the navigator's compatibility
-			//Load the map
-			var mapOptions={
-				zoom:15,
-				mapTypeId:google.maps.MapTypeId.ROADMAP,
-				center:new google.maps.LatLng(48.858093,2.294694)
-			};
-			var map=new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-			//User position, marker & accuracy
-			var userPos=null;
-			var userMarker=new google.maps.Marker({
-				map:map
-			});
-			var userArea=new google.maps.Circle({
-				map:map,
-				clickable:false,
-				fillColor:'rgb(142, 255, 163)',
-				fillOpacity:0.3,
-				strokeColor:'rgb(0, 255, 46)',
-				strokeOpacity:0.8,
-				strokeWeight:1
-			});
-			//Start watching the position
-			var geoOptions={
-				enableHighAccuracy:false,
-				timeout:15000,
-				maximumAge:10000
-			};
-			//watching effectively starts
-			var watch=navigator.geolocation.watchPosition(updatePosition, errorPosition, geoOptions);
-		}
-		else{
-			alert("Your browser does not support geolocation, please upgrade it to a newer version to use this service");
-			$state.go('login');
-		}
-		
-		//Supportive functions
-		//Success at retrieving user position
-		function updatePosition(position){
-			var lat = position.coords.latitude;
-			var lng = position.coords.longitude;
-			you.updatePosition(lat, lng, function(){
-				userPos=new google.maps.LatLng(lat, lng);
-				map.panTo(userPos);
-				userMarker.setPosition(userPos);
-				userArea.setCenter(userPos);
-				userArea.setRadius(position.coords.accuracy);
-			});
+	//Load the map
+	var mapOptions={
+		zoom:15,
+		mapTypeId:google.maps.MapTypeId.ROADMAP,
+		center:new google.maps.LatLng(48.858093,2.294694)
+	};
+	$scope.map=new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+	//User position, marker & accuracy
+	var userPos=null;
+	var userMarker=new google.maps.Marker({
+		map:$scope.map
+	});
+	var userArea=new google.maps.Circle({
+		map:$scope.map,
+		clickable:false,
+		fillColor:'rgb(142, 255, 163)',
+		fillOpacity:0.3,
+		strokeColor:'rgb(0, 255, 46)',
+		strokeOpacity:0.8,
+		strokeWeight:1
+	});
+	
+	/**
+	Navigator's compatibility with geolocation
+	*/
+	if(navigator.geolocation){ //Test the navigator's compatibility
+		//Start watching the position
+		var geoOptions={
+			enableHighAccuracy:false,
+			timeout:15000,
+			maximumAge:10000
 		};
-		//Error at retrieving position
-		function errorPosition(error){
-			console.log(error);
-		};
+		//watching effectively starts
+		var watch=navigator.geolocation.watchPosition(updatePosition, errorPosition, geoOptions);
+	}
+	else{
+		alert("Your browser does not support geolocation, please upgrade it to a newer version to use this service");
+		$state.go('login');
+	}
+	
+	//Supportive functions
+	//Success at retrieving user position
+	function updatePosition(position){
+		var lat = position.coords.latitude;
+		var lng = position.coords.longitude;
+		you.updatePosition(lat, lng, function(){
+			userPos=new google.maps.LatLng(lat, lng);
+			userMarker.setPosition(userPos);
+			userArea.setCenter(userPos);
+			userArea.setRadius(position.coords.accuracy);
+			if($scope.trackMe) $scope.map.panTo(userPos);
+		});
+	};
+	//Error at retrieving position
+	function errorPosition(error){
+		console.log(error);
 	};
 	
-	initialiseMap();
+	//Tracking variable for map follow
+	$scope.trackMe = true;
+	
+	//All users
+	$scope.users = users.users;
+	//Periodic Loading of the users (30 sec)
+	$interval(users.getAll, 30000);
 }]);
 
 //All users informations
@@ -75,7 +85,7 @@ function($http){
 	
 	o.getAll=function(){
 		return $http.get('/users').success(function(data){
-			o.users.push(data);
+			o.users = data;
 		});
 	};
 	
@@ -120,14 +130,22 @@ function($http, $state, $rootScope, $cookieStore){
 			return $http.put('/users/' + o.data._id + '/position', {lat:lat, lng:lng}).success(function(data){
 				o.data = data;
 				$rootScope.$applyAsync(function(){
-					callback.apply();
+					callback.call();
 				});
 			});
 		}
 		else{ //Just update the view, without implying the server
 			$rootScope.$applyAsync(function(){
-				callback.apply();
+				callback.call();
 			});
+		}
+	};
+	
+	o.reset = function(){
+		o.data = {
+			name: "Guest",
+			lat:0,
+			lng:0
 		}
 	};
 	

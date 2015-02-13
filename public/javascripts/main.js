@@ -26,7 +26,12 @@ function($stateProvider, $urlRouterProvider){
 	.state('login',{
 		url: '/login',
 		templateUrl: '/login.html',
-		controller: 'loginCtrl'
+		controller: 'loginCtrl',
+		resolve:{
+			reset: ['you', function(you){
+				return you.reset();
+			}]
+		}
 	});
 	
 	$urlRouterProvider.otherwise('/map');

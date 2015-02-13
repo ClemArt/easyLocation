@@ -8,7 +8,6 @@
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular.min.js"></script>
 	<script type="text/javascript" src="https:////ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular-cookies.js"></script>
 	<script type="text/javascript" src="javascripts/angular-ui-router.min.js"></script>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" type="text/css" />
 	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC8AjcbaecqJq9hUNRNMCEP5kpFNQfSBaA"></script>
 	<script type="text/javascript" src="socket.io/socket.io.js"></script>
 	
@@ -25,15 +24,15 @@
 
 <!-- Login template -->
 <script type="text/ng-template" id="/login.html">
-<div class="row">
-	<h1 class="text-center">
+<div id="login">
+	<h1>
 		Welcome {{you.name}}
 	</h1>
-	<p class="text-center">
+	<p>
 		Please log in by tipping your name (or whatever you want the others to call you).<br>
 		Your data will be deleted after you disconnect from the service.
 	</p>
-	<form ng-submit="submitLogin()" class="text-center">
+	<form ng-submit="submitLogin()">
 		<input type="text" ng-model="you.name" required /><br>
 		<button type="submit">Login</button>
 	</form>
