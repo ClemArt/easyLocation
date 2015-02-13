@@ -29,7 +29,7 @@ function($stateProvider, $urlRouterProvider){
 		controller: 'loginCtrl'
 	});
 	
-	$urlRouterProvider.otherwise('/login');
+	$urlRouterProvider.otherwise('/map');
 }]);
 
 geoApp.run([

@@ -3,7 +3,8 @@ var mongoose=require("mongoose");
 var userSchema=new mongoose.Schema({
 	name: String,
 	lat: Number,
-	lng: Number
+	lng: Number,
+	ttl: Number
 });
 
 userSchema.methods.updatePosition = function(lat, lng, callback){
