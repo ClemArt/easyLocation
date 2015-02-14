@@ -1,6 +1,5 @@
 var geoApp = angular.module('geoApp',[
 'ui.router',
-'ngCookies',
 'appCtrl'
 ]);
 

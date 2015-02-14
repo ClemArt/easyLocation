@@ -1,4 +1,6 @@
-var appCtrl = angular.module('appCtrl', []);
+var appCtrl = angular.module('appCtrl', [
+'ngCookies'
+]);
 
 appCtrl.controller('mapCtrl',[
 '$scope',
@@ -74,7 +76,7 @@ function($scope, $state, you, users, $interval){
 	//Periodic Loading of the users and updating the markers (30 sec)
 	$interval(function(){
 		users.getAll($scope.map);
-	}, 5000);
+	}, 30000);
 	
 	//Faking someone (debug purpose)
 	$scope.fakeOne = you.fakeOne;
