@@ -1,17 +1,12 @@
 <!-- Map template -->
 <div id="navBar">
-	<span id="track" class="clickable" ng-class="{inactive:!trackMe}" ng-click="trackMe=!trackMe">
-		Track Me !
-	</span>
-	<span id="track" class="clickable" ng-class="{inactive:!trackMe}" ng-click="trackMe=!trackMe">
-		Track Me !
-	</span>
+	<div id="track" class="clickable" ng-class="{inactive:!trackMe}" ng-click="trackMe=!trackMe">
+		<p>Track Me !</p>
+	</div>
+	<div id="fake" class="clickable" ng-click="fakeOne()">
+		<p>Fake Someone</p>
+	</div>
 </div>
 
 <div id="map-canvas" class="col-md-12">
-</div>
-
-<div ng-repeat="user in users">
-	<p> blaaaa ! </p>
-	
 </div>

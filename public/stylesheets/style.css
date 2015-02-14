@@ -25,23 +25,35 @@ html, body, .container, #viewPoint{
 
 .container{
 	width: 100%;
-	max-width: 700px;
+	max-width: 1000px;
 	margin: auto;
 	text-align: center;
 }
 
-#navBar{
-	height: auto;
-}
-
 #map-canvas{
-	height: 70%;
+	height: 90%;
 	width: 100%;
 }
 
+#navBar{
+	height: 10%;
+}
+
 .clickable{
+	display: inline-block;
+	height: 100%;
+	width: 15%;
+	min-width: 100px;
 	cursor: pointer;
 	border: 1px black solid;
+	box-sizing: border-box;
+	border-radius: 5px;
+}
+
+.clickable p{
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
 }
 
 .inactive{

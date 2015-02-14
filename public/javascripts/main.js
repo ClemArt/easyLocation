@@ -18,7 +18,7 @@ function($stateProvider, $urlRouterProvider){
 				return you.loginCheck();
 			}],
 			usersPreload: ['users', function(users){
-				return users.getAll();
+				return users.getAll(null);
 			}]
 		}
 	})

@@ -71,8 +71,13 @@ function($scope, $state, you, users, $interval){
 	
 	//All users
 	$scope.users = users.users;
-	//Periodic Loading of the users (30 sec)
-	$interval(users.getAll, 30000);
+	//Periodic Loading of the users and updating the markers (30 sec)
+	$interval(function(){
+		users.getAll($scope.map);
+	}, 5000);
+	
+	//Faking someone (debug purpose)
+	$scope.fakeOne = you.fakeOne;
 }]);
 
 //All users informations
@@ -80,15 +85,37 @@ appCtrl.factory('users', [
 '$http',
 function($http){
 	var o={
-		users:[]
+		users:[],
+		markers:[]
 	};
 	
-	o.getAll=function(){
+	o.getAll=function(map){
 		return $http.get('/users').success(function(data){
 			o.users = data;
+			o.makeMarkers();
+			o.markerMap(map);
 		});
 	};
 	
+	o.makeMarkers=function(){
+		o.markerMap(null);
+		o.markers = [];
+		for(index=0; index<o.users.length; index++){
+			console.log('marker make : '+index+'    '+o.users[index]._id);
+			var pos = new google.maps.LatLng(o.users[index].lat, o.users[index].lng);
+			o.markers.push(new google.maps.Marker({
+				position:pos
+			}));
+		}
+	};
+	
+	o.markerMap=function(map){
+		for(index=0; index<o.markers.length; index++){
+			console.log('marker map : '+index+'    '+map);
+			o.markers[index].setMap(map);
+		}
+	};
+
 	return o;
 }]);
 
@@ -107,6 +134,20 @@ function($http, $state, $rootScope, $cookieStore){
 		}
 	};
 	
+	//Fake posting user for testing purpose
+	o.fakeOne = function(){
+		var u = angular.copy(o.data);
+		console.log(u);
+		delete u._id;
+		u.name = 'testing'+Math.random();
+		console.log(u.name);
+		u.lat += 2*Math.random()-1;
+		u.lng += 2*Math.random()-1;
+		return $http.post('/users', u).success(function(data){
+			console.log(data);
+		});
+	};
+	
 	//Log the user with his name and change state to draw the map
 	o.login = function(){
 		return $http.post('/users', o.data).success(function(data){
@@ -121,24 +162,24 @@ function($http, $state, $rootScope, $cookieStore){
 		return $http.get('/users/' + $cookieStore.get('user_id')).success(function(data, status){
 			o.data = data;
 			$cookieStore.put('user_id', o.data._id);
+			//To insure position is updated at least at first, put it to 0,0
+			o.data.lat = 0;
+			o.data.lng = 0;
 		});
 	};
 	
 	o.updatePosition = function(lat, lng, callback){
 		//update to the server if position changed
 		if((lat-o.data.lat)*(lat-o.data.lat)+(lng-o.data.lng)*(lng-o.data.lng) > 0.00005){
-			return $http.put('/users/' + o.data._id + '/position', {lat:lat, lng:lng}).success(function(data){
-				o.data = data;
-				$rootScope.$applyAsync(function(){
-					callback.call();
-				});
+			$http.put('/users/' + o.data._id + '/position', {lat:lat, lng:lng}).success(function(data){
+				o.data.lat = lat;
+				o.data.lng = lng;
 			});
 		}
-		else{ //Just update the view, without implying the server
-			$rootScope.$applyAsync(function(){
-				callback.call();
-			});
-		}
+		//Just update the view, without implying the server
+		$rootScope.$applyAsync(function(){
+			callback.call();
+		});
 	};
 	
 	o.reset = function(){
