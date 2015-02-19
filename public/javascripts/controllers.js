@@ -76,7 +76,7 @@ function($scope, $state, you, users, $interval){
 	//Periodic Loading of the users and updating the markers (30 sec)
 	$interval(function(){
 		users.getAll($scope.map);
-	}, 30000);
+	}, 3000);
 	
 	//Faking someone (debug purpose)
 	$scope.fakeOne = you.fakeOne;
@@ -139,10 +139,8 @@ function($http, $state, $rootScope, $cookieStore){
 	//Fake posting user for testing purpose
 	o.fakeOne = function(){
 		var u = angular.copy(o.data);
-		console.log(u);
 		delete u._id;
 		u.name = 'testing'+Math.random();
-		console.log(u.name);
 		u.lat += 2*Math.random()-1;
 		u.lng += 2*Math.random()-1;
 		return $http.post('/users', u).success(function(data){
@@ -161,24 +159,22 @@ function($http, $state, $rootScope, $cookieStore){
 	
 	//Try to get the user data with ID, and store it. If not, server throws a 500 internal server error (id not found) and app returns to login state
 	o.loginCheck = function(){
-		return $http.get('/users/' + $cookieStore.get('user_id')).success(function(data, status){
+		return $http.get('/users/' + $cookieStore.get('user_id')).success(function(data){
 			o.data = data;
 			$cookieStore.put('user_id', o.data._id);
 			//To insure position is updated at least at first, put it to 0,0
-			o.data.lat = 0;
-			o.data.lng = 0;
+			setPosition(0,0);
 		});
 	};
 	
 	o.updatePosition = function(lat, lng, callback){
 		//update to the server if position changed
 		if((lat-o.data.lat)*(lat-o.data.lat)+(lng-o.data.lng)*(lng-o.data.lng) > 0.00005){
-			$http.put('/users/' + o.data._id + '/position', {lat:lat, lng:lng}).success(function(data){
-				o.data.lat = lat;
-				o.data.lng = lng;
+			$http.put('/users/' + o.data._id + '/position', {lat:lat, lng:lng}).success(function(){
+				setPosition(lat,lng);
 			});
 		}
-		//Just update the view, without implying the server
+		// Update the view, without implying the server
 		$rootScope.$applyAsync(function(){
 			callback.call();
 		});
@@ -190,6 +186,11 @@ function($http, $state, $rootScope, $cookieStore){
 			lat:0,
 			lng:0
 		}
+	};
+	
+	function setPosition(lat,lng){
+		o.data.lat = lat;
+		o.data.lng = lng;
 	};
 	
 	return o;
